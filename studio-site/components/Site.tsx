@@ -12,7 +12,7 @@ const SERVICES: [string, string, string][] = [
 ];
 const STEPS = [["Discovery", "Understand the client's goals, audience, and requirements."], ["Strategy", "Develop the creative direction and visual approach."], ["Design", "Explore concepts, create designs, and refine the strongest direction."], ["Refinement", "Incorporate feedback and polish the final deliverables."], ["Delivery", "Provide final files, assets, and agreed deliverables."]];
 const WORDS = ["BRAND IDENTITY", "GRAPHIC DESIGN", "MOTION DESIGN", "UI/UX", "DIGITAL EXPERIENCES"];
-const bg = (g: [string, string], img?: string) => ({ backgroundImage: `${img ? `url(${img}),` : ""}linear-gradient(135deg,${g[0]},${g[1]})` });
+const bg = (g: [string, string], img?: string) => ({ backgroundImage: `${img ? `url("${img}"),` : ""}linear-gradient(135deg,${g[0]},${g[1]})` });
 
 export default function Site({ c }: { c: Content }) {
   const [scrolled, setScrolled] = useState(false), [menu, setMenu] = useState(false);
@@ -111,7 +111,7 @@ export default function Site({ c }: { c: Content }) {
       <dialog ref={dlg} onClose={() => setOpen(null)} onClick={e => { if (e.target === dlg.current) dlg.current?.close(); }} aria-labelledby="dt">
         {p && <><div className="dh" style={bg(p.g, p.img)} /><button className="x" aria-label="Close" onClick={() => dlg.current?.close()}>&times;</button>
           <div className="db"><small style={{ color: "var(--grey)" }}>{p.c} · {p.y}</small><h3 id="dt">{p.t}</h3><p>{p.d}</p>
-            <dl><dt>Overview</dt><dd>{p.o}</dd><dt>Process</dt><dd>{p.p}</dd><dt>Deliverables</dt><dd>{p.dl}</dd><dt>Results</dt><dd>{p.r}</dd></dl></div></>}
+            <dl><dt>Overview</dt><dd>{p.o}</dd><dt>Process</dt><dd>{p.p}</dd><dt>Deliverables</dt><dd>{p.dl}</dd><dt>Results</dt><dd>{p.r}</dd></dl>{p.gallery?.length > 0 && <div className="gal">{p.gallery.map((u, k) => <img key={k} src={u} alt={`${p.t} design ${k + 1}`} loading="lazy" />)}</div>}</div></>}
       </dialog>
 
       <section className="show"><div className="wrap">
@@ -125,7 +125,7 @@ export default function Site({ c }: { c: Content }) {
         </div></div></section>
 
       <section id="about"><div className="wrap ab">
-        <div className="portrait"><b>Add your portrait or studio photo</b></div>
+        <div className="portrait" style={c.portrait ? { backgroundImage: `url("${c.portrait}")`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}>{!c.portrait && <b>Add your portrait or studio photo</b>}</div>
         <div>
           <h2>Good design gets attention. <span className="g">Great design builds recognition.</span></h2>
           <p style={{ marginTop: 20, color: "var(--grey)" }}>We combine strategic thinking, visual storytelling, and contemporary design to create work that gives brands a stronger identity and a more memorable presence.</p>

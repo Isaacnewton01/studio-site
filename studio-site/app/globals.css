@@ -101,3 +101,7 @@ footer ul{list-style:none;padding:0;margin:10px 0 0;display:grid;gap:8px;color:#
 .adm h2{font-size:1.6rem}.row{display:flex;gap:10px;flex-wrap:wrap}.sub{border:1px dashed var(--line);border-radius:16px;padding:18px;display:grid;gap:12px}
 .bar-fix{position:sticky;bottom:0;background:var(--bg);padding:14px 0;border-top:1px solid var(--line);display:flex;gap:12px;align-items:center}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+dialog{max-height:90vh;overflow:auto}
+.gal{display:grid;gap:12px;margin-top:24px}.gal img{width:100%;border-radius:14px;display:block}
+.thumbs{display:flex;gap:10px;flex-wrap:wrap}.thumbs figure{margin:0;display:grid;gap:6px}.thumbs img{width:120px;height:90px;object-fit:cover;border-radius:10px}
