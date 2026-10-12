@@ -1,27 +1,18 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
+import { getContent, saveContent, type Content } from "@/lib/content";
+import { isAdmin } from "@/lib/auth";
 
-export async function POST(req: Request) {
-  const d = await req.json().catch(() => null);
-  if (!d) return NextResponse.json({ error: "Bad request" }, { status: 400 });
-  // spam protection: honeypot + minimum fill time
-  if (d.website || Number(d.elapsed) < 3000) return NextResponse.json({ error: "Blocked as spam" }, { status: 400 });
-  const s = (k: string, max = 2000) => String(d[k] ?? "").trim().slice(0, max);
-  const name = s("name", 120), email = s("email", 200), desc = s("desc");
-  if (!name || !/^\S+@\S+\.\S+$/.test(email) || desc.length < 20 || !s("service") || !s("budget"))
-    return NextResponse.json({ error: "Please complete all required fields." }, { status: 400 });
-  const key = process.env.RESEND_API_KEY, to = process.env.CONTACT_TO;
-  if (!key || !to) return NextResponse.json({ error: "Email is not configured on the server." }, { status: 500 });
+export const dynamic = "force-dynamic";
 
-  const r = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      from: process.env.CONTACT_FROM || "onboarding@resend.dev",
-      to: [to], reply_to: email,
-      subject: `Project inquiry from ${name}`,
-      text: `Name: ${name}\nEmail: ${email}\nCompany: ${s("company")}\nService: ${s("service")}\nBudget: ${s("budget")}\nTimeline: ${s("timeline")}\n\n${desc}`,
-    }),
-  });
-  if (!r.ok) return NextResponse.json({ error: "Could not send your message. Please try WhatsApp or email." }, { status: 502 });
+export async function GET() { return NextResponse.json(await getContent()); }
+
+export async function PUT(req: Request) {
+  if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const c = (await req.json().catch(() => null)) as Content | null;
+  if (!c?.brand || !Array.isArray(c.projects) || !Array.isArray(c.stats) || !Array.isArray(c.testimonials) || !Array.isArray(c.budgets))
+    return NextResponse.json({ error: "Invalid content" }, { status: 400 });
+  try { await saveContent(c); } catch (e) { return NextResponse.json({ error: (e as Error).message }, { status: 500 }); }
+  revalidatePath("/");
   return NextResponse.json({ ok: true });
 }
